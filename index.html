@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Eternal Love Story 💖</title>
+  <meta name="description" content="A premium romantic surprise website made with love.">
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/interactive.css">
+
+  <!-- Icons (FontAwesome) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- Background Particle Engine -->
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- Custom Cursor -->
+  <div class="custom-cursor" id="cursor"></div>
+  <div class="custom-cursor-dot" id="cursor-dot"></div>
+
+  <!-- Teddy Bear Follower -->
+  <div id="teddy-follower" style="position: fixed; pointer-events: none; z-index: 9998; width: 45px; height: 45px; transition: transform 0.1s ease; transform: translate(-50%, -50%);">
+    <svg viewBox="0 0 100 100" style="width: 100%; height: 100%;">
+      <!-- Teddy Head -->
+      <circle cx="50" cy="55" r="28" fill="#a16d56" stroke="#5d3a2a" stroke-width="3" />
+      <!-- Left Ear -->
+      <circle cx="28" cy="30" r="12" fill="#a16d56" stroke="#5d3a2a" stroke-width="3" />
+      <circle cx="28" cy="30" r="6" fill="#f0b4a4" />
+      <!-- Right Ear -->
+      <circle cx="72" cy="30" r="12" fill="#a16d56" stroke="#5d3a2a" stroke-width="3" />
+      <circle cx="72" cy="30" r="6" fill="#f0b4a4" />
+      <!-- Muzzle -->
+      <circle cx="50" cy="62" r="11" fill="#f5dbcd" />
+      <ellipse cx="50" cy="58" rx="5" ry="3.5" fill="#3c2216" />
+      <path d="M 50 61 L 50 67 M 46 68 Q 50 71 54 68" stroke="#3c2216" stroke-width="2" fill="none" />
+      <!-- Left Eye -->
+      <circle cx="40" cy="46" r="3.5" fill="#3c2216" />
+      <circle cx="39" cy="45" r="1" fill="#fff" />
+      <!-- Right Eye -->
+      <circle cx="60" cy="46" r="3.5" fill="#3c2216" />
+      <circle cx="59" cy="45" r="1" fill="#fff" />
+      <!-- Cheeks -->
+      <circle cx="33" cy="54" r="3" fill="#ffa4b4" opacity="0.8" />
+      <circle cx="67" cy="54" r="3" fill="#ffa4b4" opacity="0.8" />
+      <!-- Little heart on head -->
+      <path d="M 50 20 C 47 15, 42 20, 50 27 C 58 20, 53 15, 50 20 Z" fill="#ff2d55" />
+    </svg>
+  </div>
+
+  <!-- Scroll Progress Bar -->
+  <div id="scroll-progress-bar" style="position:fixed; top:0; left:0; height:3px; width:0%; background: linear-gradient(90deg, var(--accent-pink), var(--accent-purple), #ff6b9d); z-index:10001; transition: width 0.1s ease; box-shadow: 0 0 8px var(--accent-pink-glow);"></div>
+
+  <!-- Birthday Banner (auto-shows on June 27) -->
+  <div id="birthday-banner" style="display:none; position:fixed; top:0; left:0; width:100%; z-index:9997; text-align:center; padding:10px 0; background: linear-gradient(90deg, #ff2d55, #a855f7, #ff2d55); background-size:200% auto; animation: gradientSlide 3s linear infinite; font-size:0.9rem; font-weight:700; color:#fff; letter-spacing:2px; text-shadow: 0 0 10px rgba(255,255,255,0.5);">
+    🎂 HAPPY BIRTHDAY SIMRAN! 🎉 Today is Your Special Day, My Love! 🎂
+  </div>
+
+
+  <div id="loader">
+    <div class="loader-heart">❤️</div>
+    <div class="loader-bar-container">
+      <div class="loader-bar" id="loader-bar"></div>
+    </div>
+    <div class="loader-text" id="loader-text">Opening our universe...</div>
+    <button class="btn-romantic hidden" id="loader-entry-btn" style="margin-top: 25px; display: none; animation: heartBeat 1.5s infinite ease-in-out;">Open Surprise 🎁</button>
+  </div>
+
+  <!-- Floating Confetti/Celebration Button -->
+  <button id="celebrate-btn" title="Celebrate!" style="position:fixed; bottom:100px; left:25px; z-index:1001; width:50px; height:50px; border-radius:50%; border:none; background: linear-gradient(135deg, #ff2d55, #a855f7); color:white; font-size:1.4rem; cursor:pointer; box-shadow: 0 4px 15px rgba(255,45,85,0.4); transition: transform 0.3s ease, box-shadow 0.3s ease; animation: float 4s ease-in-out infinite;">🎉</button>
+
+  <!-- Floating Compliment Ticker -->
+  <div class="compliment-ticker" id="compliment-ticker">
+    <div class="compliment-ticker-icon">💖</div>
+    <div class="compliment-text" id="compliment-text">You make my world so much brighter.</div>
+  </div>
+
+  <!-- Sticky/Floating Top Controls -->
+  <div class="floating-controls">
+    <!-- Overlay particle setting toggle button -->
+    <button class="control-btn" id="effects-panel-btn" title="Visual Effects Options">
+      <i class="fa-solid fa-wand-magic-sparkles"></i>
+    </button>
+    <!-- Light/Dark Mode toggle button -->
+    <button class="control-btn" id="theme-toggle" title="Switch Theme">
+      <i class="fa-solid fa-moon"></i>
+    </button>
+    <!-- Music floating play/pause button -->
+    <button class="control-btn" id="music-toggle-btn" title="Toggle Music">
+      <i class="fa-solid fa-music"></i>
+    </button>
+  </div>
+
+  <!-- Music Player Panel (Expanded Overlay) -->
+  <div class="music-control-expanded" id="music-expanded-panel">
+    <div class="music-player-mini">
+      <div class="album-art-wrap">
+        <div class="album-art" id="album-art">💖</div>
+      </div>
+      <div class="player-details">
+        <h4 class="track-name" id="track-title">Ethereal Love (Piano)</h4>
+        <p class="track-artist" id="track-artist">Antigravity Synth</p>
+        
+        <div class="player-progress-container" id="player-progress-bar">
+          <div class="player-progress" id="player-progress-fill"></div>
+        </div>
+
+        <div class="player-controls">
+          <button class="player-btn" id="player-prev-btn"><i class="fa-solid fa-backward-step"></i></button>
+          <button class="player-btn play-pause-btn" id="player-play-btn"><i class="fa-solid fa-circle-play"></i></button>
+          <button class="player-btn" id="player-next-btn"><i class="fa-solid fa-forward-step"></i></button>
+        </div>
+
+        <div class="volume-container">
+          <i class="fa-solid fa-volume-low volume-icon"></i>
+          <input type="range" class="volume-slider" id="volume-slider" min="0" max="1" step="0.05" value="0.5">
+          <i class="fa-solid fa-volume-high volume-icon"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Visual Effects Settings Toggle Panel -->
+  <div class="music-control-expanded" id="effects-expanded-panel" style="top: 80px; right: 145px; width: 220px;">
+    <h4 style="font-size: 0.9rem; text-align: center; margin-bottom: 12px; color: var(--text-primary); border-bottom: 1px solid var(--glass-border); padding-bottom: 5px;">Canvas Overlay</h4>
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <button class="btn-romantic-outline effects-select-btn active" style="padding: 8px; font-size: 0.8rem; border-radius: 12px; text-align: left;" data-effect="hearts">💖 Floating Hearts</button>
+      <button class="btn-romantic-outline text-align-left effects-select-btn" style="padding: 8px; font-size: 0.8rem; border-radius: 12px; text-align: left;" data-effect="stars">✨ Twinkling Stars</button>
+      <button class="btn-romantic-outline effects-select-btn" style="padding: 8px; font-size: 0.8rem; border-radius: 12px; text-align: left;" data-effect="snow">❄️ Falling Snow</button>
+      <button class="btn-romantic-outline effects-select-btn" style="padding: 8px; font-size: 0.8rem; border-radius: 12px; text-align: left;" data-effect="bubbles">🫧 Rising Bubbles</button>
+      <button class="btn-romantic-outline effects-select-btn" style="padding: 8px; font-size: 0.8rem; border-radius: 12px; text-align: left;" data-effect="confetti">🎉 Party Confetti</button>
+      <label style="font-size: 0.75rem; color: var(--text-muted); display: flex; align-items: center; justify-content: space-between; margin-top: 5px; padding: 0 4px;">
+        Mouse Trail Sparkle
+        <input type="checkbox" id="trail-checkbox" checked style="accent-color: var(--accent-pink);">
+      </label>
+    </div>
+  </div>
+
+  <!-- Main Website Tabs Navigation (Floating bottom glassbar) -->
+  <div class="navbar-container">
+    <nav class="navbar">
+      <a class="nav-item active" data-target="landing-tab">
+        <i class="fa-solid fa-house"></i>
+        <span>Home</span>
+      </a>
+      <a class="nav-item" data-target="story-tab">
+        <i class="fa-solid fa-book-open"></i>
+        <span>Story</span>
+      </a>
+      <a class="nav-item" data-target="letter-tab">
+        <i class="fa-solid fa-envelope-open-text"></i>
+        <span>Letter</span>
+      </a>
+      <a class="nav-item" data-target="gallery-tab">
+        <i class="fa-solid fa-images"></i>
+        <span>Gallery</span>
+      </a>
+      <a class="nav-item" data-target="timers-tab">
+        <i class="fa-solid fa-hourglass-half"></i>
+        <span>Timers</span>
+      </a>
+      <a class="nav-item" data-target="reasons-tab">
+        <i class="fa-solid fa-heart-circle-check"></i>
+        <span>Reasons</span>
+      </a>
+      <a class="nav-item" data-target="play-tab">
+        <i class="fa-solid fa-gamepad"></i>
+        <span>Garden & Play</span>
+      </a>
+      <a class="nav-item" data-target="secret-tab">
+        <i class="fa-solid fa-lock"></i>
+        <span>Secret Portal</span>
+      </a>
+    </nav>
+  </div>
+
+  <!-- Page Content sections -->
+  <main>
+    
+    <!-- 1. Landing Page Section -->
+    <section id="landing-tab" class="page-section">
+      <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; max-width: 700px; padding: 20px;">
+        <!-- Landing Avatar -->
+        <div class="landing-avatar-wrap" style="margin-bottom: 25px; position: relative;">
+          <div class="landing-avatar" style="width: 140px; height: 140px; border-radius: 50%; overflow: hidden; border: 4px solid var(--accent-pink); box-shadow: 0 0 25px var(--accent-pink-glow); transition: transform 0.5s ease; cursor: pointer; animation: float 6s ease-in-out infinite;">
+            <img src="images/WhatsApp Image 2026-06-25 at 10.57.49 PM.jpeg" alt="Simran" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+        </div>
+        
+        <h1 class="section-title" style="font-size: 3.5rem; line-height: 1.1; margin-bottom: 20px;">
+          To My Beautiful Simran, <br>
+          <span style="color: var(--accent-pink); text-shadow: 0 0 10px var(--accent-pink-glow);">My Heart is Yours</span>
+        </h1>
+        
+        <!-- Typewriter Container -->
+        <div style="min-height: 70px; margin-bottom: 30px;">
+          <p id="typewriter-text" style="font-family: var(--font-serif); font-size: 1.5rem; color: var(--text-secondary); font-style: italic; font-weight: 500;"></p>
+        </div>
+
+        <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
+          <button class="btn-romantic" id="enter-story-btn">
+            Enter Our Universe <i class="fa-solid fa-chevron-right"></i>
+          </button>
+          <button class="btn-romantic-outline" id="play-ambient-btn">
+            Play Piano Synth <i class="fa-solid fa-music"></i>
+          </button>
+        </div>
+
+        <!-- Birthday Cake Section -->
+        <div class="birthday-cake-wrap" style="margin-top: 40px;">
+          <div class="cake" id="birthday-cake">
+            <!-- Candles -->
+            <div class="cake-candles">
+              <div class="candle"><div class="flame"></div></div>
+              <div class="candle"><div class="flame"></div></div>
+              <div class="candle"><div class="flame"></div></div>
+            </div>
+            <!-- Cake layers -->
+            <div class="cake-top"></div>
+            <div class="cake-bottom"></div>
+          </div>
+          <p style="font-family: var(--font-cursive); font-size: 2rem; color: var(--accent-pink); margin-top: 10px; text-shadow: 0 0 10px var(--accent-pink-glow);">Happy Birthday, My Love! 🎂</p>
+          <button class="btn-romantic" id="blow-candles-btn" style="margin-top: 8px; font-size: 0.85rem; padding: 10px 22px;">Blow Candles 💨</button>
+        </div>
+
+        <!-- Long Distance Cards -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; width: 100%; max-width: 700px; margin-top: 45px;">
+          
+          <!-- Distance Badge Card -->
+          <div class="glass-card" style="padding: 25px; text-align: center; border: 1px solid rgba(255,45,85,0.3);">
+            <div style="font-size: 2.5rem; margin-bottom: 10px;">📍</div>
+            <div style="font-family: var(--font-serif); font-size: 2.2rem; font-weight: 700; color: var(--accent-pink); line-height: 1;">417 km</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px;">Apart in distance</div>
+            <div style="font-family: var(--font-cursive); font-size: 1.4rem; color: var(--accent-purple); margin-top: 8px;">0 km apart in heart ❤️</div>
+          </div>
+
+          <!-- Dual Clock Card -->
+          <div class="glass-card" style="padding: 25px; text-align: center; border: 1px solid rgba(168,85,247,0.3);">
+            <div style="font-size: 2rem; margin-bottom: 10px;">🕐</div>
+            <div style="display: flex; justify-content: space-around; gap: 10px;">
+              <div>
+                <div style="font-size: 0.7rem; font-weight: 700; letter-spacing: 2px; color: var(--text-muted); text-transform: uppercase;">Raiganj 🏠</div>
+                <div id="clock-him" style="font-family: var(--font-serif); font-size: 1.6rem; font-weight: 700; color: var(--accent-pink); margin-top: 4px;">--:--</div>
+              </div>
+              <div style="display: flex; align-items: center; color: var(--accent-purple); font-size: 1.2rem;">💕</div>
+              <div>
+                <div style="font-size: 0.7rem; font-weight: 700; letter-spacing: 2px; color: var(--text-muted); text-transform: uppercase;">Kolkata 👸</div>
+                <div id="clock-her" style="font-family: var(--font-serif); font-size: 1.6rem; font-weight: 700; color: var(--accent-purple); margin-top: 4px;">--:--</div>
+              </div>
+            </div>
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 10px;">Same timezone, same heart 💜</div>
+          </div>
+
+          <!-- Virtual Hug Card -->
+          <div class="glass-card" style="padding: 25px; text-align: center; border: 1px solid rgba(255,45,85,0.3); grid-column: 1 / -1;">
+            <div style="font-size: 2rem; margin-bottom: 8px;">🤗</div>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 15px;">Distance can never stop me from holding you in my heart.</p>
+            <button class="btn-romantic" id="send-hug-btn" style="font-size: 0.9rem; padding: 12px 30px;">
+              Send a Virtual Hug 🫂
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 2. Story / Timeline & Map Section -->
+    <section id="story-tab" class="page-section hidden">
+      <h2 class="section-title">Our Love Journey</h2>
+      <p class="section-subtitle">A simple timeline of milestones and memories. No matter the miles, our hearts have always been together.</p>
+      
+      <!-- Interactive World Map showing connections -->
+      <div class="map-container glass-card">
+        <h3 style="text-align: center; font-size: 1.2rem; margin-bottom: 15px; font-family: var(--font-serif);">Connecting Hearts Across Distance</h3>
+        <!-- Stylized inline SVG map -->
+        <svg class="map-svg" viewBox="0 0 800 450" id="world-map">
+          <!-- Abstract grid representing oceans/continents -->
+          <g fill="rgba(255,45,85,0.06)">
+            <!-- North America -->
+            <path d="M 50 100 Q 150 70, 200 120 T 150 250 T 80 180 Z" />
+            <!-- South America -->
+            <path d="M 120 220 Q 160 250, 190 320 T 150 420 T 100 300 Z" />
+            <!-- Eurasia -->
+            <path d="M 400 80 Q 550 50, 680 100 T 720 220 T 550 250 Z" />
+            <!-- Africa -->
+            <path d="M 420 220 Q 480 200, 520 280 T 480 380 T 430 300 Z" />
+            <!-- Australia -->
+            <path d="M 650 320 Q 720 330, 710 380 T 630 390 Z" />
+          </g>
+
+          <!-- Pulsing Rings around cities -->
+          <circle class="map-pulse" cx="360" cy="150" r="4" />
+          <circle class="map-pulse" cx="440" cy="300" r="4" />
+
+          <!-- Connecting line (animated dash) -->
+          <path class="map-connection-line" id="map-curve" d="M 360 150 Q 430 210, 440 300" />
+
+          <!-- Location Pins -->
+          <g transform="translate(360, 150)">
+            <path class="map-pin" d="M0,0 C-6,-12 -10,-12 -10,-20 C-10,-26 -5,-30 0,-30 C5,-30 10,-26 10,-20 C10,-12 6,-12 0,0 Z" />
+            <circle cx="0" cy="-20" r="3.5" fill="#fff" />
+            <text class="map-label" x="12" y="-16">Raiganj 🏠</text>
+          </g>
+
+          <g transform="translate(440, 300)">
+            <path class="map-pin pin-second" d="M0,0 C-6,-12 -10,-12 -10,-20 C-10,-26 -5,-30 0,-30 C5,-30 10,-26 10,-20 C10,-12 6,-12 0,0 Z" />
+            <circle cx="0" cy="-20" r="3.5" fill="#fff" />
+            <text class="map-label" x="12" y="-16">Kolkata 👸</text>
+          </g>
+        </svg>
+        <div class="distance-badge">
+          Distance: <span style="color: var(--accent-pink); font-weight:700;">417 km</span> of Endless Love
+        </div>
+      </div>
+
+      <!-- Vertical Story Timeline -->
+      <div class="timeline-wrap" id="timeline-container">
+        <!-- Rendered dynamically from data.js -->
+      </div>
+
+      <!-- Chat Simulation Container -->
+      <h3 class="section-title" style="font-size: 1.8rem; margin-top: 80px; margin-bottom: 5px;">Our Everyday Chats 💬</h3>
+      <p class="section-subtitle">The sweet, silly exchanges that make distance disappear.</p>
+      <div class="chat-container glass-card" id="chat-simulator-card">
+        <div class="chat-header">
+          <div class="chat-avatar" style="overflow: hidden;">
+            <img src="images/WhatsApp Image 2026-06-25 at 10.57.52 PM (1).jpeg" alt="Simran" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+          </div>
+          <div class="chat-user-info">
+            <h4>Simran 💖</h4>
+            <div class="chat-status" id="chat-user-status">online</div>
+          </div>
+        </div>
+        <div class="chat-messages" id="chat-messages-wrap">
+          <!-- Chat messages fade in one by one -->
+          <div class="chat-typing-indicator" id="chat-typing-indicator" style="display: none;">
+            <div class="chat-typing-dot"></div>
+            <div class="chat-typing-dot"></div>
+            <div class="chat-typing-dot"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Embedded Video Memory section -->
+      <h3 class="section-title" style="font-size: 1.8rem; margin-top: 80px; margin-bottom: 5px;">Our Video Memories 🎥</h3>
+      <p class="section-subtitle">A collection of virtual dates, silly clips, and video call recordings.</p>
+      
+      <div class="glass-card" style="width: 100%; max-width: 650px; padding: 15px; border-radius: 20px;">
+        <div style="width:100%; border-radius:12px; overflow:hidden; background:#000; position: relative;">
+          <!-- Our local memory video -->
+          <video
+            style="width:100%; display:block; border-radius:12px; max-height: 400px; object-fit: cover;"
+            controls
+            preload="metadata"
+            poster=""
+          >
+            <source src="memories video.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+        <h4 style="font-family: var(--font-serif); margin-top: 15px; font-size:1.15rem; color:var(--text-primary); text-align:center;">Our Precious Memory Together 💖</h4>
+      </div>
+
+    </section>
+
+    <!-- 3. Love Letter Section -->
+    <section id="letter-tab" class="page-section hidden">
+      <h2 class="section-title">A Written Confession</h2>
+      <p class="section-subtitle">Open the envelope to read what my heart wanted to write for you.</p>
+
+      <div class="letter-section-wrap">
+        <!-- 3D Envelope -->
+        <div class="envelope-wrapper" id="envelope-box">
+          <div class="envelope-flap"></div>
+          <div class="envelope-seal"><i class="fa-solid fa-heart"></i></div>
+          
+          <!-- Handwritten letter paper inside -->
+          <div class="letter-paper" id="letter-paper-item">
+            <div class="letter-header">Dear Beautiful,</div>
+            <div class="letter-content" id="letter-text-content">
+              <!-- Animated typewriter page contents loaded from data -->
+            </div>
+            <div class="letter-footer">With all my love,<br>Yours Forever</div>
+          </div>
+          
+          <div class="envelope-pocket"></div>
+        </div>
+
+        <!-- Page Turning controls for letter -->
+        <div class="letter-controls">
+          <button class="btn-romantic-outline" id="letter-prev-btn" style="padding: 8px 20px; font-size: 0.8rem;"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+          <span style="font-weight: 600; color: var(--text-secondary); align-self: center;" id="letter-page-indicator">Page 1 of 3</span>
+          <button class="btn-romantic" id="letter-next-btn" style="padding: 8px 20px; font-size: 0.8rem;">Next <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Memory Polaroid Gallery Section -->
+    <section id="gallery-tab" class="page-section hidden">
+      <h2 class="section-title">Captured Moments</h2>
+      <p class="section-subtitle">A collection of our photos, screenshots of video calls, and romantic memories.</p>
+
+      <div class="gallery-section-wrap">
+        
+        <!-- 3D Perspective card slider carousel -->
+        <h3 style="font-family: var(--font-serif); font-size:1.4rem; text-align:center; color: var(--text-primary); margin-bottom:-20px;">Feature Slider</h3>
+        <div class="carousel-container">
+          <div class="carousel-track" id="carousel-track-container">
+            <!-- Populated dynamically by gallery.js -->
+          </div>
+        </div>
+
+        <!-- Polaroid Masonry Board -->
+        <h3 style="font-family: var(--font-serif); font-size:1.4rem; text-align:center; color: var(--text-primary); margin-top:20px; margin-bottom:-10px;">Memory Collage Grid</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; width:100%;" id="masonry-grid">
+          <!-- Populated dynamically by gallery.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Love Timer & Birthday Countdown Section -->
+    <section id="timers-tab" class="page-section hidden">
+      <h2 class="section-title">Ticking for You</h2>
+      <p class="section-subtitle">Measuring our love in days, hours, and seconds. Every heartbeat counts.</p>
+
+      <div class="glass-card" style="width:100%; max-width: 700px; padding: 40px 20px; text-align:center;">
+        <h3 style="font-family:var(--font-serif); font-size:1.5rem; margin-bottom: 25px; color: var(--text-primary);">Time We Have Been Together</h3>
+        
+        <div class="timer-container" id="love-duration-timer">
+          <div class="timer-box"><div class="timer-num" id="t-days">00</div><div class="timer-label">Days</div></div>
+          <div class="timer-box"><div class="timer-num" id="t-hours">00</div><div class="timer-label">Hours</div></div>
+          <div class="timer-box"><div class="timer-num" id="t-mins">00</div><div class="timer-label">Mins</div></div>
+          <div class="timer-box"><div class="timer-num" id="t-secs">00</div><div class="timer-label">Secs</div></div>
+        </div>
+
+        <div style="font-family: var(--font-cursive); font-size:1.8rem; color:var(--accent-pink); margin-top:15px;">...and falling deeper in love with every single tick.</div>
+      </div>
+
+      <div class="glass-card" style="width:100%; max-width: 700px; padding: 40px 20px; text-align:center; margin-top: 40px;">
+        <h3 style="font-family:var(--font-serif); font-size:1.5rem; margin-bottom: 25px; color: var(--text-primary);">Countdown to Your Next Birthday 🎂</h3>
+        
+        <div class="timer-container" id="birthday-countdown-timer">
+          <div class="timer-box"><div class="timer-num" id="b-days">00</div><div class="timer-label">Days</div></div>
+          <div class="timer-box"><div class="timer-num" id="b-hours">00</div><div class="timer-label">Hours</div></div>
+          <div class="timer-box"><div class="timer-num" id="b-mins">00</div><div class="timer-label">Mins</div></div>
+          <div class="timer-box"><div class="timer-num" id="b-secs">00</div><div class="timer-label">Secs</div></div>
+        </div>
+
+        <div style="font-size:0.9rem; color:var(--text-muted); margin-top:20px;">
+          Next Birthday: <span id="target-birthday-date" style="color:var(--accent-pink); font-weight:600;">June 27, 2026</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. 100 Reasons I Love You Section -->
+    <section id="reasons-tab" class="page-section hidden">
+      <h2 class="section-title">100 Reasons Why</h2>
+      <p class="section-subtitle">Here are 100 little tokens of my love. Click on any card to flip it and reveal the reason.</p>
+
+      <div class="reasons-container">
+        <div class="reasons-grid" id="reasons-card-grid">
+          <!-- Populated dynamically via app.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. Garden & Proposal Games Section -->
+    <section id="play-tab" class="page-section hidden">
+      <h2 class="section-title">My Heart's Playpen</h2>
+      <p class="section-subtitle">Play interactive mini games and grow a virtual garden of sweet surprises.</p>
+
+      <!-- Virtual Flower Garden -->
+      <div class="glass-card garden-container">
+        <h3 style="font-family: var(--font-serif); font-size: 1.5rem; margin-bottom: 10px;">The Virtual Flower Garden 🌹</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 25px;">Click on these flower slots to water them, make them bloom, and reveal a secret letter message.</p>
+        <div class="garden-grid" id="garden-grid">
+          <!-- Bloomed flowers injected here -->
+        </div>
+      </div>
+
+      <!-- Funny Proposal Evasion Game -->
+      <div class="glass-card" style="width:100%; max-width:600px; padding:35px 20px; text-align:center; margin-top:45px; overflow:hidden;">
+        <h3 style="font-family: var(--font-serif); font-size: 1.6rem; margin-bottom: 10px;">A Very Important Question... 🥺</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">Will you stay with me forever and ever, through thick and thin?</p>
+        
+        <div class="game-area" id="proposal-game-area">
+          <div class="proposal-btn-container">
+            <button class="btn-romantic" id="yes-btn">YES ❤️</button>
+            <button class="btn-romantic-outline" id="no-btn">NO 😒</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Secret Box Surprise Section -->
+      <div class="glass-card" style="width:100%; max-width:600px; padding:35px 20px; text-align:center; margin-top:45px;">
+        <h3 style="font-family: var(--font-serif); font-size: 1.6rem; margin-bottom: 10px;">Secret Surprise Gift Box 🎁</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">Click the shaking gift box to open a virtual chest of magical surprises!</p>
+        
+        <div class="giftbox-wrapper">
+          <div class="giftbox" id="surprise-giftbox">
+            <div class="giftbox-bow"></div>
+            <div class="giftbox-lid"></div>
+            <div class="giftbox-body">
+              <div class="giftbox-ribbon-v"></div>
+              <div class="giftbox-ribbon-h"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Future Dreams Section -->
+      <h3 class="section-title" style="font-size: 1.8rem; margin-top: 80px; margin-bottom: 5px;">Our Future Dreams 💭🏡</h3>
+      <p class="section-subtitle">The goals and checklist we are working towards together.</p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; width: 100%; max-width: 1000px;" id="dreams-container">
+        <!-- Renders dream cards -->
+        <div class="glass-card polaroid" style="padding: 15px 15px 25px;">
+          <div class="polaroid-img-wrap" style="height: 180px;">
+            <img src="https://images.unsplash.com/photo-1513584684374-8bab748fbf90?auto=format&fit=crop&q=80&w=400" alt="Cottage">
+          </div>
+          <span class="polaroid-caption" style="font-size: 1.2rem;">Our Dream Home 🏡</span>
+          <p style="font-size: 0.8rem; color: var(--text-muted); text-align: center; margin-top: 10px;">A cozy cottage with a blue roof, flower garden, and window swing.</p>
+        </div>
+        <div class="glass-card polaroid" style="padding: 15px 15px 25px;">
+          <div class="polaroid-img-wrap" style="height: 180px;">
+            <img src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&q=80&w=400" alt="Travel">
+          </div>
+          <span class="polaroid-caption" style="font-size: 1.2rem;">Travel Goals ✈️</span>
+          <p style="font-size: 0.8rem; color: var(--text-muted); text-align: center; margin-top: 10px;">Exploring Japan, Italy, and taking long road trips across the coast.</p>
+        </div>
+        <div class="glass-card polaroid" style="padding: 15px 15px 25px;">
+          <div class="polaroid-img-wrap" style="height: 180px;">
+            <img src="https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?auto=format&fit=crop&q=80&w=400" alt="Wedding">
+          </div>
+          <span class="polaroid-caption" style="font-size: 1.2rem;">Marriage & Future 💍</span>
+          <p style="font-size: 0.8rem; color: var(--text-muted); text-align: center; margin-top: 10px;">Growing old together, holding hands, drinking coffee on the porch.</p>
+        </div>
+        <div class="glass-card polaroid" style="padding: 15px 15px 25px;">
+          <div class="polaroid-img-wrap" style="height: 180px;">
+            <img src="https://images.unsplash.com/photo-1492725764893-90b379c2b6e7?auto=format&fit=crop&q=80&w=400" alt="Family">
+          </div>
+          <span class="polaroid-caption" style="font-size: 1.2rem;">Tiny Steps 🐾</span>
+          <p style="font-size: 0.8rem; color: var(--text-muted); text-align: center; margin-top: 10px;">Adopting a fluffy golden retriever named Waffles, and children later.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. Secret Passcode Portal Section -->
+    <section id="secret-tab" class="page-section hidden">
+      <h2 class="section-title">The Secret Portal</h2>
+      <p class="section-subtitle">This dashboard is locked just for you, my love. Enter your birthday date to unlock your surprise! 🎂</p>
+
+      <!-- Keypad entry screen -->
+      <div id="secret-lock-screen" class="glass-card passcode-wrapper">
+        <div style="font-size: 3rem; color: var(--accent-pink); margin-bottom: 15px;"><i class="fa-solid fa-lock"></i></div>
+        <h3 style="font-family: var(--font-serif); font-size:1.3rem; margin-bottom: 20px;">Enter Your Lover's Birthday Code 💕</h3>
+        
+        <div class="passcode-display">
+          <div class="passcode-dot"></div>
+          <div class="passcode-dot"></div>
+          <div class="passcode-dot"></div>
+          <div class="passcode-dot"></div>
+        </div>
+
+        <div class="keypad" id="keypad">
+          <button class="keypad-btn" data-val="1">1</button>
+          <button class="keypad-btn" data-val="2">2</button>
+          <button class="keypad-btn" data-val="3">3</button>
+          <button class="keypad-btn" data-val="4">4</button>
+          <button class="keypad-btn" data-val="5">5</button>
+          <button class="keypad-btn" data-val="6">6</button>
+          <button class="keypad-btn" data-val="7">7</button>
+          <button class="keypad-btn" data-val="8">8</button>
+          <button class="keypad-btn" data-val="9">9</button>
+          <button class="keypad-btn" data-val="clear"><i class="fa-solid fa-xmark"></i></button>
+          <button class="keypad-btn" data-val="0">0</button>
+          <button class="keypad-btn" data-val="enter"><i class="fa-solid fa-check"></i></button>
+        </div>
+
+        <div class="secret-error-msg" id="secret-error-msg"></div>
+      </div>
+
+      <!-- Secret Content Screen (Locked originally) -->
+      <div id="secret-dashboard" class="hidden" style="width:100%; max-width: 900px; display:flex; flex-direction:column; align-items:center;">
+        <div class="glass-card" style="width:100%; padding:30px; text-align:center;">
+          <h3 style="font-family: var(--font-serif); font-size:1.8rem; color: var(--accent-pink); margin-bottom: 10px;">Welcome to Your Secret Chest, Love! 🎟️💖</h3>
+          <p style="font-size:0.85rem; color:var(--text-muted); max-width:550px; margin:0 auto 20px;">Below is your personalized booklet of virtual love coupons. Claim any of them to redeem a surprise when we meet!</p>
+          
+          <div class="coupons-grid" id="coupons-grid">
+            <!-- Coupon cards injected dynamically -->
+          </div>
+        </div>
+
+        <!-- Secret Photo Gallery -->
+        <div class="glass-card" style="width:100%; padding:30px; text-align:center; margin-top: 40px;">
+          <h3 style="font-family: var(--font-serif); font-size:1.8rem; color: var(--accent-pink); margin-bottom: 10px;">Our Secret Album 📸💞</h3>
+          <p style="font-size:0.85rem; color:var(--text-muted); max-width:550px; margin:0 auto 20px;">Every single moment with you is a treasure. Here are some of our special memories together!</p>
+          
+          <div class="secret-gallery-grid" id="secret-gallery-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 25px; width: 100%; margin-top: 20px;">
+            <!-- Secret memories injected dynamically -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Global Modal Popup -->
+  <div class="lightbox" id="romantic-modal" style="background: rgba(10, 3, 17, 0.85);">
+    <div class="lightbox-content-wrap glass-card" style="background: var(--bg-primary); max-width: 480px; padding: 40px 30px; text-align: center; border-radius:24px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
+      <div style="font-size: 4rem; color: var(--accent-pink); margin-bottom: 15px; animation: heartBeat 1.2s infinite ease-in-out;">❤️</div>
+      <h3 id="modal-title" style="font-family: var(--font-serif); font-size: 1.6rem; color: var(--text-primary); margin-bottom: 15px;">Modal Title</h3>
+      <p id="modal-text" style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 25px;">Modal details go here.</p>
+      <button class="btn-romantic" id="modal-close-btn" style="padding:10px 25px;">Close ❤️</button>
+    </div>
+  </div>
+
+  <!-- Global Image Lightbox View -->
+  <div class="lightbox" id="gallery-lightbox">
+    <button class="lightbox-close" id="lightbox-close-btn"><i class="fa-solid fa-xmark"></i></button>
+    <button class="lightbox-nav lightbox-prev" id="lightbox-prev-btn"><i class="fa-solid fa-chevron-left"></i></button>
+    <div class="lightbox-content-wrap">
+      <img class="lightbox-img" id="lightbox-img-el" src="" alt="Lightbox image">
+      <div class="lightbox-caption" id="lightbox-caption-el">Caption details</div>
+    </div>
+    <button class="lightbox-nav lightbox-next" id="lightbox-next-btn"><i class="fa-solid fa-chevron-right"></i></button>
+  </div>
+
+  <!-- JS Code Files -->
+  <script src="js/data.js?v=1.1"></script>
+  <script src="js/particles.js?v=1.1"></script>
+  <script src="js/audio.js?v=1.1"></script>
+  <script src="js/game.js?v=1.1"></script>
+  <script src="js/app.js?v=1.1"></script>
+</body>
+</html>
